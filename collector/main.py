@@ -10,18 +10,15 @@ def json_lambda(x): return str(x) if type(x) is Decimal else x.__dict__
 username = os.getenv('PGE_EMAIL')
 password = os.getenv('PGE_PASSWORD')
 
-client = OPowerApi(verbose=True)
+client = OPowerApi(verbose=False)
 client.login(
     username=username,
     password=password
 )
 
 current_customers = client.current_customers()
-print('getting customer info')
-print(json.dumps(current_customers, indent=2, default=json_lambda))
-
 opower_uuid = current_customers.uuid
 utility_account_uuid = current_customers.utility_accounts[0].uuid
+utility_usage_hourly = client.utility_usage_hourly(utility_account_uuid, start_date='2023-01-22', end_date='2023-01-23')
 
-print('downloading file ...')
-client.download_usage(opower_uuid, start_date='2023-01-22', end_date='2023-01-23')
+print(json.dumps(utility_usage_hourly, indent=2, default=json_lambda))
